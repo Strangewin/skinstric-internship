@@ -138,7 +138,7 @@ export default function Home() {
         <div className="absolute w-100 h-100 rotate-132 border-2 border-gray-200 -translate-y-10"></div>
         <div className="absolute w-80 h-80 rotate-132 border-2 border-gray-200  -translate-y-10"></div>
         <div className="z-10 text-center px-6">
-          <h1 className="text-3xl font-bold -translate-y-10" style={{
+          <h1 ref={centerTextRef} className="text-3xl font-bold -translate-y-10" style={{
               fontFamily: 'Roobert TRIAL, sans-serif',
               fontWeight: 300,
               fontSize: '60px',
@@ -149,14 +149,15 @@ export default function Home() {
             Skinstric developed an A.I. that creates a <br />highly-personalized routine tailored to <br />what your skin needs.
           </p>
 
-          <div className="flex items-center justify-center mt-4 space-x-2">
-            <span className="text-sm font-bold  -translate-y-10">Enter Experience</span>
-            <Link href="/testing">
-              <span className="inline-flex rotate-45 items-center justify-center w-5 h-5 border border-black  -translate-y-10">
-                <IoTriangleSharp className="-rotate-320" size={10} />
-              </span>
-            </Link>
-          </div>
+         <Link
+  href="/testing"
+  className="group flex items-center justify-center mt-4 space-x-2 transition-transform duration-300 hover:scale-110"
+>
+  <span className="text-sm font-bold -translate-y-10">Enter Experience</span>
+  <span className="inline-flex rotate-45 items-center justify-center w-5 h-5 border border-black -translate-y-10">
+    <IoTriangleSharp className="-rotate-320" size={10} />
+  </span>
+</Link>
         </div>
       </div>
 
