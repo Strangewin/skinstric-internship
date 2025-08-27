@@ -6,45 +6,58 @@ import Link from "next/link";
 import { IoTriangleSharp } from "react-icons/io5";
 
 export default function Home() {
-  const centerTextRef = useRef(null);
   const leftArrowRef = useRef(null);
   const rightArrowRef = useRef(null);
   const leftRectRef = useRef(null);
   const rightRectRef = useRef(null);
+  const centerTextDesktopRef = useRef(null);
+  const centerTextMobileRef = useRef(null);
 
   const glideDistance = 400;
 
-  useEffect(() => {
+useEffect(() => {
+  // Animate desktop text
+  if (centerTextDesktopRef.current) {
     gsap.fromTo(
-      centerTextRef.current,
+      centerTextDesktopRef.current,
       { opacity: 0 },
       { opacity: 1, duration: 1.2, ease: "power3.in" }
     );
-  }, []);
+  }
+
+  // Animate mobile text
+  if (centerTextMobileRef.current) {
+    gsap.fromTo(
+      centerTextMobileRef.current,
+      { opacity: 0 },
+      { opacity: 1, duration: 1.2, ease: "power3.in" }
+    );
+  }
+}, []);
 
   const handleLeftHover = () => {
-    gsap.to(centerTextRef.current, { x: glideDistance, duration: .8, ease: "power2.inOut" });
+    gsap.to(centerTextDesktopRef.current, { x: glideDistance, duration: .8, ease: "power2.inOut" });
     gsap.to(rightRectRef.current, { opacity: 0, duration: 0.5, ease: "power2.inOut" });
     gsap.to(rightArrowRef.current, { opacity: 0, duration: 0.5, ease: "power2.inOut" });
     gsap.to(leftArrowRef.current, { scale: 1.05, duration: 0.5, ease: "power2.inOut" });
   };
 
   const handleLeftHoverOut = () => {
-    gsap.to(centerTextRef.current, { x: 0, duration: .8, ease: "power2.inOut" });
+    gsap.to(centerTextDesktopRef.current, { x: 0, duration: .8, ease: "power2.inOut" });
     gsap.to(rightRectRef.current, { opacity: 1, duration: 0.5, ease: "power2.inOut" });
     gsap.to(rightArrowRef.current, { opacity: 1, duration: 0.5, ease: "power2.inOut" });
     gsap.to(leftArrowRef.current, { scale: 1, duration: 0.5, ease: "power2.inOut" });
   };
 
   const handleRightHover = () => {
-    gsap.to(centerTextRef.current, { x: -glideDistance, duration: .8, ease: "power2.inOut" });
+    gsap.to(centerTextDesktopRef.current, { x: -glideDistance, duration: .8, ease: "power2.inOut" });
     gsap.to(leftRectRef.current, { opacity: 0, duration: 0.5, ease: "power2.inOut" });
     gsap.to(leftArrowRef.current, { opacity: 0, duration: 0.5, ease: "power2.inOut" });
     gsap.to(rightArrowRef.current, { scale: 1.05, duration: 0.5, ease: "power2.inOut" });
   };
 
   const handleRightHoverOut = () => {
-    gsap.to(centerTextRef.current, { x: 0, duration: .8, ease: "power2.inOut" });
+    gsap.to(centerTextDesktopRef.current, { x: 0, duration: .8, ease: "power2.inOut" });
     gsap.to(leftRectRef.current, { opacity: 1, duration: 0.5, ease: "power2.inOut" });
     gsap.to(leftArrowRef.current, { opacity: 1, duration: 0.5, ease: "power2.inOut" });
     gsap.to(rightArrowRef.current, { scale: 1, duration: 0.5, ease: "power2.inOut" });
@@ -84,7 +97,7 @@ export default function Home() {
 
         <div className="flex flex-col items-center justify-center min-h-screen">
           <h1
-            ref={centerTextRef}
+            ref={centerTextDesktopRef}
             className="z-10 text-center"
             style={{
               fontFamily: 'Roobert TRIAL, sans-serif',
@@ -128,8 +141,20 @@ export default function Home() {
           </Link>
         </div>
 
-        <div className="absolute left-30 bottom-40 m-8 max-w-xs text-xs font-bold text-black opacity-80 leading-snug font-Roobert TRIAL">
-          SKINSTRIC DEVELOPED AN A.I. THAT CREATES A<br />HIGHLY-PERSONALIZED ROUTINE TAILORED TO<br />WHAT YOUR SKIN NEEDS.
+        {/* Responsive bottom left description */}
+        <div>
+          {/* Desktop: larger, more lines, bolder */}
+          <div className="hidden lg:block absolute left-30 bottom-40 m-8 max-w-xs text-xs font-bold text-black opacity-80 leading-snug font-Roobert TRIAL">
+            SKINSTRIC DEVELOPED AN A.I. THAT CREATES A<br />HIGHLY-PERSONALIZED ROUTINE TAILORED TO<br />WHAT YOUR SKIN NEEDS.
+          </div>
+          {/* Tablet: medium size, fewer lines */}
+          <div className="hidden sm:block lg:hidden absolute left-8 bottom-8 m-4 max-w-xs text-xs font-semibold text-black opacity-80 leading-snug font-Roobert TRIAL">
+            SKINSTRIC DEVELOPED AN A.I. THAT CREATES A HIGHLY-PERSONALIZED ROUTINE TAILORED TO WHAT YOUR SKIN NEEDS.
+          </div>
+          {/* Mobile: smallest, single line */}
+          <div className="block sm:hidden absolute left-4 bottom-4 m-2 max-w-[90vw] text-[10px] font-medium text-black opacity-80 leading-tight font-Roobert TRIAL">
+            SKINSTRIC: A.I. for your personalized skincare routine.
+          </div>
         </div>
       </div>
 
@@ -138,7 +163,7 @@ export default function Home() {
         <div className="absolute w-100 h-100 rotate-132 border-2 border-gray-200 -translate-y-10"></div>
         <div className="absolute w-80 h-80 rotate-132 border-2 border-gray-200  -translate-y-10"></div>
         <div className="z-10 text-center px-6">
-          <h1 ref={centerTextRef} className="text-3xl font-bold -translate-y-10" style={{
+          <h1 ref={centerTextMobileRef} className="text-3xl font-bold -translate-y-10" style={{
               fontFamily: 'Roobert TRIAL, sans-serif',
               fontWeight: 300,
               fontSize: '60px',
