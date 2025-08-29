@@ -28,8 +28,9 @@ function RotatingSquares({ imgSrc, imgAlt, onClick }) {
         <div
           key={idx}
           ref={ref}
-          className={`absolute w-[${sizes[idx]}px] h-[${sizes[idx]}px] border-3 border-dotted ${colors[idx]} rounded-lg`}
-        ></div>
+          style={{ width: `${sizes[idx]}px`, height: `${sizes[idx]}px` }}
+          className={`absolute border-4 border-dotted ${colors[idx]} rounded-lg`}
+        />
       ))}
 
       <button

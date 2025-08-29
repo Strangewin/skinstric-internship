@@ -3,7 +3,6 @@ import Link from "next/link";
 import { IoTriangleSharp } from "react-icons/io5";
 import { useRef, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-
 function RotatingSquares({ imgSrc, imgAlt, onClick, callout, children }) {
   const squares = [useRef(null), useRef(null), useRef(null)];
   const sizes = [300, 350, 400];
@@ -31,7 +30,8 @@ function RotatingSquares({ imgSrc, imgAlt, onClick, callout, children }) {
         <div
           key={idx}
           ref={ref}
-          className={`absolute w-[${sizes[idx]}px] h-[${sizes[idx]}px] border-3 border-dotted ${colors[idx]} rounded-lg`}
+          style={{ width: `${sizes[idx]}px`, height: `${sizes[idx]}px` }}
+          className={`absolute border-4 border-dotted ${colors[idx]} rounded-lg`}
         />
       ))}
 
@@ -75,7 +75,6 @@ function RotatingSquares({ imgSrc, imgAlt, onClick, callout, children }) {
         </div>
       )}
 
-      {/* Slot for small popup near the button */}
       {children}
     </div>
   );
