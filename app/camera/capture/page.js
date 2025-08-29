@@ -17,7 +17,7 @@ export default function CameraPage() {
   useEffect(() => {
     const startCamera = async () => {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
         if (videoRef.current) videoRef.current.srcObject = stream;
         setLoading(false);
 
@@ -81,6 +81,7 @@ export default function CameraPage() {
             ref={videoRef}
             autoPlay
             playsInline
+            muted
             className="w-full h-full rounded-lg border border-gray-300 object-cover"
           />
 
@@ -121,7 +122,7 @@ export default function CameraPage() {
 
              <Link
         href="/"
-        className="group absolute left-8 bottom-8 flex items-center z-20"
+        className="group absolute left-20 bottom-28 flex items-center z-20"
       >
         <span className="inline-flex items-center justify-center w-10 h-10 rotate-45 border border-white mr-2 transition-transform duration-300 group-hover:scale-110">
           <IoTriangleSharp className="text-white rotate-[-20deg]" size={14} />
