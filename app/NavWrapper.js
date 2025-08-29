@@ -5,10 +5,10 @@ import Navbar from "./Navbar";
 
 export default function NavWrapper({ children }) {
   const pathname = usePathname();
-  const hideNavbar = pathname === "/camera/capture";
+
   return (
     <>
-      {!hideNavbar && <Navbar />}
+      { <Navbar />}
       {children}
     </>
   );

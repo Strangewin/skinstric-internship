@@ -2,8 +2,9 @@
 import Link from "next/link";
 import { IoTriangleSharp } from "react-icons/io5";
 import { useRef, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
-function RotatingSquares({ imgSrc, imgAlt, onClick, callout }) {
+function RotatingSquares({ imgSrc, imgAlt, onClick, callout, children }) {
   const squares = [useRef(null), useRef(null), useRef(null)];
   const sizes = [300, 350, 400];
   const durations = [50000, 70000, 90000];
@@ -73,85 +74,94 @@ function RotatingSquares({ imgSrc, imgAlt, onClick, callout }) {
           </div>
         </div>
       )}
+
+      {/* Slot for small popup near the button */}
+      {children}
     </div>
   );
 }
 
 export default function ResultPage() {
-  const [selectedImage, setSelectedImage] = useState(null);
+  const router = useRouter();
+  const [showCameraPrompt, setShowCameraPrompt] = useState(false);
 
-
-
-
-  const openCamera = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      alert("Camera access granted! (Stream available in console)");
-      console.log(stream);
-    } catch (err) {
-      alert("Camera access denied or not available.");
-      console.error(err);
-    }
+  const openCameraPrompt = () => setShowCameraPrompt(true);
+  const handleAllowCamera = () => {
+    setShowCameraPrompt(false);
+    router.push("/camera");
   };
+  const handleDenyCamera = () => setShowCameraPrompt(false);
 
   const openGallery = () => {
-    alert("Gallery access (to be implemented)");
+    document.getElementById("galleryInput")?.click();
   };
 
-const handleImageUpload = async (event) => {
-  const file = event.target.files[0];
-  if (!file) return;
+  const handleImageUpload = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
 
-  const reader = new FileReader();
-  reader.onloadend = async () => {
-    const base64Image = reader.result; // Base64 string
-    setSelectedImage(base64Image);
-    setLoading(true);
-
-    try {
-      const response = await fetch(
-        "https://us-central1-frontend-simplified.cloudfunctions.net/skinstricPhaseTwo",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ image: base64Image }),
-        }
-      );
-
-      if (!response.ok) throw new Error("Network response was not ok");
-
-      const data = await response.json();
-      console.log("AI predictions:", data);
-      setAiPredictions(data); // store the results for later use
-    } catch (err) {
-      console.error("Error sending image:", err);
-      alert("There was an error uploading the image.");
-    } finally {
-      setLoading(false);
-    }
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      const base64Image = reader.result;
+      try {
+        const response = await fetch(
+          "https://us-central1-frontend-simplified.cloudfunctions.net/skinstricPhaseTwo",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ image: base64Image }),
+          }
+        );
+        if (!response.ok) throw new Error("Network response was not ok");
+        const data = await response.json();
+        console.log("AI predictions:", data);
+      } catch (err) {
+        console.error("Error sending image:", err);
+        alert("There was an error uploading the image.");
+      }
+    };
+    reader.readAsDataURL(file);
   };
-  reader.readAsDataURL(file);
-};
 
   return (
     <div className="relative min-h-screen w-full bg-white flex flex-col items-center justify-center overflow-hidden">
       <div className="flex flex-row items-center justify-center gap-16 z-10">
-        {/* First square, camera */}
+       
         <RotatingSquares
           imgSrc="/camera-shutter.png"
           imgAlt="Open Camera"
-          onClick={openCamera}
+          onClick={openCameraPrompt}
           callout={{
             position: "right-[-30px] top-1/2 translate-y-[-150%]",
             lineRotation: "rotate-[-30deg]",
             offset: "-top-14 -left-6",
             text: "ALLOW A.I. \nTO SCAN YOUR FACE",
           }}
-        />
+        >
+          {showCameraPrompt && (
+            <div className="absolute left-[90%] -translate-x-1/2 w-[290px] h-[100px] rounded- border border-black/15 bg-black shadow-lg z-20">
+              <div className="px-4 py-3 text-center text-white text-sm  font-semibold">
+                ALLOW AI TO ACCESS CAMERA?
+              </div>
+              <div className="flex border-t text-white ">
+                <button
+                  onClick={handleDenyCamera}
+                  className="flex-1 py-2 text-sm cursor-pointer hover:gray-100 transition-colors"
+                >
+                  DENY
+                </button>
+                <button
+                  onClick={handleAllowCamera}
+                  className="flex-1 py-2 text-sm cursor-pointer font-bold hover:gray-100 transform transition-colors"
+                >
+                  ALLOW
+                </button>
+              </div>
+            </div>
+          )}
+        </RotatingSquares>
 
-        {/* Second square, gallery */}
+      
         <RotatingSquares
           imgSrc="/image-gallery.png"
           imgAlt="Open Photo Library"
@@ -165,7 +175,7 @@ const handleImageUpload = async (event) => {
           }}
         />
 
-        {/* Hidden file input for gallery */}
+      
         <input
           id="galleryInput"
           type="file"
@@ -175,7 +185,7 @@ const handleImageUpload = async (event) => {
         />
       </div>
 
-      {/* Back button */}
+  
       <Link
         href="/"
         className="group absolute left-14 bottom-28 flex items-center z-20"
@@ -188,5 +198,7 @@ const handleImageUpload = async (event) => {
     </div>
   );
 }
+
+
 
 

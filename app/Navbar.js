@@ -11,6 +11,7 @@ export default function Navbar() {
         <Link href="/camera" className="text-lg">Camera</Link>
         <Link href="/select" className="text-lg">Select</Link>
         <Link href="/summary" className="text-lg">Summary</Link>
+        <Link href="/camera/capture" className="text-lg">Capture</Link>
       </div>
       <button className="inline-flex items-center justify-center gap-2 whitespace-nowrap font-semibold  transition-colors  disabled:pointer-events-none text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2 mx-4 scale-[0.8] text-[#FCFCFC] text-[10px] bg-[#1A1B1C] leading-[16px]">ENTER CODE</button>
     </nav>
