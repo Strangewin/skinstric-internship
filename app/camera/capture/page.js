@@ -19,7 +19,9 @@ export default function CameraPage() {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
         console.log("Camera stream:", stream);
+        console.log("Video ref:", videoRef.current);
         if (videoRef.current) videoRef.current.srcObject = stream;
+        
         setLoading(false);
 
         // Optional: stop stream when unmount
@@ -32,7 +34,7 @@ export default function CameraPage() {
       }
     };
     startCamera();
-  }, []);
+  }, [videoRef, setLoading]);
 
   
   // Handle capture and upload
