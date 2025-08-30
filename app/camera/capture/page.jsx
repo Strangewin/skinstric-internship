@@ -12,10 +12,7 @@ export default function CameraPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [takingPhoto, setTakingPhoto] = useState(false);
-
-  // Start camera
-  useEffect(() => {
-    const startCamera = async () => {
+ const startCamera = async () => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
         console.log("Camera stream:", stream);
@@ -33,8 +30,11 @@ export default function CameraPage() {
         alert("Camera access denied or unavailable");
       }
     };
-    startCamera();
-  }, [videoRef, setLoading]);
+  // Start camera
+  useEffect(() => {
+   
+    void startCamera();
+  }, [videoRef, loading]);
 
   
   // Handle capture and upload
