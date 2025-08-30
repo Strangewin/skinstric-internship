@@ -18,6 +18,7 @@ export default function CameraPage() {
     const startCamera = async () => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+        console.log("Camera stream:", stream);
         if (videoRef.current) videoRef.current.srcObject = stream;
         setLoading(false);
 
