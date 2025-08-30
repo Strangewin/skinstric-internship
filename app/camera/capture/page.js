@@ -33,42 +33,55 @@ export default function CameraPage() {
     startCamera();
   }, []);
 
+  
   // Handle capture and upload
-  const handleCapture = async () => {
-    if (!videoRef.current || !canvasRef.current) return;
+const handleCapture = async () => {
+  if (!videoRef.current || !canvasRef.current) return;
 
-    setTakingPhoto(true);
+  setTakingPhoto(true);
 
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    const ctx = canvas.getContext("2d");
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  const video = videoRef.current;
+  const canvas = canvasRef.current;
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-    const base64Image = canvas.toDataURL("image/png").split(",")[1];
+  const base64Image = canvas.toDataURL("image/png").split(",")[1];
 
+  try {
+    const response = await fetch(
+      "https://us-central1-frontend-simplified.cloudfunctions.net/skinstricPhaseTwo",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image: base64Image }),
+      }
+    );
+    const result = await response.json();
+    
+    // Use a try-catch block to handle the console.log error
     try {
-      const response = await fetch(
-        "https://us-central1-frontend-simplified.cloudfunctions.net/skinstricPhaseTwo",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ image: base64Image }),
-        }
-      );
-      const result = await response.json();
       console.log("AI Response:", result);
-
+    } catch (e) {
+      console.log("AI Response:", "Could not log object due to circular reference error.");
+    }
+    
+    // Check if result is a valid object before storing
+    if (result && typeof result === 'object' && result.success) {
       sessionStorage.setItem("demographicData", JSON.stringify(result));
       router.push("/result");
-    } catch (error) {
-      console.error("Upload failed:", error);
-      alert("Failed to upload image. Try again.");
-    } finally {
-      setTakingPhoto(false);
+    } else {
+      console.error("API response was not successful or invalid.");
+      alert("Failed to get a valid response from the API. Try again.");
     }
-  };
+  } catch (error) {
+    console.error("Upload failed:", error);
+    alert("Failed to upload image. Try again.");
+  } finally {
+    setTakingPhoto(false);
+  }
+};
 
   return (
     <div className="relative flex flex-col items-center justify-center min-h-screen w-full bg-black overflow-hidden">
@@ -120,15 +133,15 @@ export default function CameraPage() {
             )}
           </button>
 
-             <Link
-        href="/"
-        className="group absolute left-20 bottom-28 flex items-center z-20"
-      >
-        <span className="inline-flex items-center justify-center w-10 h-10 rotate-45 border border-white mr-2 transition-transform duration-300 group-hover:scale-110">
-          <IoTriangleSharp className="text-white rotate-[-20deg]" size={14} />
-        </span>
-        <div className="text-sm text-white font-bold ml-6">BACK</div>
-      </Link>
+          <Link
+            href="/"
+            className="group absolute left-20 bottom-28 flex items-center z-20"
+          >
+            <span className="inline-flex items-center justify-center w-10 h-10 rotate-45 border border-white mr-2 transition-transform duration-300 group-hover:scale-110">
+              <IoTriangleSharp className="text-white rotate-[-20deg]" size={14} />
+            </span>
+            <div className="text-sm text-white font-bold ml-6">BACK</div>
+          </Link>
         </div>
       )}
     </div>
