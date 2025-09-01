@@ -35,7 +35,7 @@ function RotatingSquares({ imgSrc, imgAlt, onClick, callout, children }) {
         />
       ))}
 
-      {/* Center image button */}
+    
       <button
         type="button"
         aria-label={imgAlt}
@@ -49,7 +49,7 @@ function RotatingSquares({ imgSrc, imgAlt, onClick, callout, children }) {
         />
       </button>
 
-      {/* Optional callout */}
+      
       {callout && (
         <div className={`absolute flex items-center ${callout.position}`}>
           <div
@@ -83,6 +83,7 @@ function RotatingSquares({ imgSrc, imgAlt, onClick, callout, children }) {
 export default function ResultPage() {
   const router = useRouter();
   const [showCameraPrompt, setShowCameraPrompt] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); 
 
   const openCameraPrompt = () => setShowCameraPrompt(true);
   const handleAllowCamera = () => {
@@ -95,37 +96,52 @@ export default function ResultPage() {
     document.getElementById("galleryInput")?.click();
   };
 
-  const handleImageUpload = async (event) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+const handleImageUpload = async (event) => {
+  const file = event.target.files?.[0];
+  if (!file) return;
 
-    const reader = new FileReader();
-    reader.onloadend = async () => {
-      const base64Image = reader.result;
-      try {
-        const response = await fetch(
-          "https://us-central1-frontend-simplified.cloudfunctions.net/skinstricPhaseTwo",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ image: base64Image }),
-          }
-        );
-        if (!response.ok) throw new Error("Network response was not ok");
-        const data = await response.json();
-        console.log("AI predictions:", data);
-      } catch (err) {
-        console.error("Error sending image:", err);
-        alert("There was an error uploading the image.");
-      }
-    };
-    reader.readAsDataURL(file);
+  setIsLoading(true);
+
+  const reader = new FileReader();
+  reader.onloadend = async () => {
+    const base64Image = reader.result;
+
+    
+    const fetchPromise = fetch("https://us-central1-frontend-simplified.cloudfunctions.net/skinstricPhaseTwo", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ image: base64Image }),
+    }).then(res => res.json());
+
+    
+    setTimeout(() => {
+      router.push("/select");
+    }, 3000);
+
+    
+    fetchPromise.then(data => {
+      console.log("AI predictions:", data);
+    
+    }).catch(err => {
+      console.error("Error sending image:", err);
+    });
   };
 
+  reader.readAsDataURL(file);
+};
   return (
     <div className="relative min-h-screen w-full bg-white flex flex-col items-center justify-center overflow-hidden">
+      {/* Loading overlay */}
+      {isLoading && (
+        <div className="absolute inset-0 bg-white/100 flex items-center justify-center z-50">
+         
+            <p className="text-lg font-semibold text-black">PREPARING YOUR ANALYSIS...</p>
+         
+        </div>
+      )}
+
       <div className="flex flex-row items-center justify-center gap-16 z-10">
-       
+        {/* Camera shutter (unchanged) */}
         <RotatingSquares
           imgSrc="/camera-shutter.png"
           imgAlt="Open Camera"
@@ -139,7 +155,7 @@ export default function ResultPage() {
         >
           {showCameraPrompt && (
             <div className="absolute left-[90%] -translate-x-1/2 w-[290px] h-[100px] rounded- border border-black/15 bg-black shadow-lg z-20">
-              <div className="px-4 py-3 text-center text-white text-sm  font-semibold">
+              <div className="px-4 py-3 text-center text-white text-sm font-semibold">
                 ALLOW AI TO ACCESS CAMERA?
               </div>
               <div className="flex border-t text-white ">
@@ -160,7 +176,7 @@ export default function ResultPage() {
           )}
         </RotatingSquares>
 
-      
+        {/* ✅ Gallery upload with loading + redirect */}
         <RotatingSquares
           imgSrc="/image-gallery.png"
           imgAlt="Open Photo Library"
@@ -174,7 +190,6 @@ export default function ResultPage() {
           }}
         />
 
-      
         <input
           id="galleryInput"
           type="file"
@@ -184,7 +199,6 @@ export default function ResultPage() {
         />
       </div>
 
-  
       <Link
         href="/"
         className="group absolute left-14 bottom-28 flex items-center z-20"
@@ -197,6 +211,7 @@ export default function ResultPage() {
     </div>
   );
 }
+
 
 
 
