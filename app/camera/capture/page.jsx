@@ -14,8 +14,6 @@ export default function CameraPage() {
   const [takingPhoto, setTakingPhoto] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
 useEffect(() => {
-    void startCamera();
-  }, []);
   const startCamera = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -31,6 +29,8 @@ useEffect(() => {
   };
 
   
+    void startCamera();
+  }, []);
 
   const handleCapture = () => {
     if (!videoRef.current || !canvasRef.current) return;
