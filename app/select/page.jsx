@@ -1,75 +1,174 @@
 "use client";
-import Link from "next/link";
+import { useRef, useEffect } from "react";
 import { IoTriangleSharp } from "react-icons/io5";
+import gsap from "gsap";
+import Link from "next/link";
 
-export default function SummaryPage() {
-  const squareSize = 150; 
-  const gap = 3; 
+export default function SelectPage() {
+  const squareSize = 150;
+  
+ 
+  const demographicsButtonRef = useRef(null);
+  const skinTypeButtonRef = useRef(null);
+  const cosmeticButtonRef = useRef(null);
+  const weatherButtonRef = useRef(null);
+  const sharedOutlineRef = useRef(null); 
+
+  
+  const createHoverEffect = (buttonRef, maxScale = 1.9) => {
+    if (!buttonRef.current || !sharedOutlineRef.current) return null;
+
+    const button = buttonRef.current;
+    const outline = sharedOutlineRef.current;
+
+    const onEnter = () => {
+      
+      gsap.timeline()
+        .to(outline, {
+          scale: 0.1,
+          opacity: 1,
+          duration: 0.15,
+          ease: "power2.in",
+        })
+        .to(outline, {
+          scale: maxScale,
+          opacity: 1,
+          duration: 0.35,
+          ease: "power2.out",
+        });
+    };
+
+    const onLeave = () => {
+      gsap.to(outline, {
+        scale: 0.1, 
+        opacity: 0,
+        duration: 0.3,
+        ease: "power2.in",
+      });
+    };
+
+    
+    button.addEventListener("mouseenter", onEnter);
+    button.addEventListener("mouseleave", onLeave);
+
+   
+    return () => {
+      button.removeEventListener("mouseenter", onEnter);
+      button.removeEventListener("mouseleave", onLeave);
+    };
+  };
+
+  useEffect(() => {
+    
+    if (sharedOutlineRef.current) {
+      gsap.set(sharedOutlineRef.current, { scale: 0.1, opacity: 0 });
+    }
+
+   
+    const cleanupDemographics = createHoverEffect(demographicsButtonRef, 1.4); 
+    const cleanupSkinType = createHoverEffect(skinTypeButtonRef, 1.5); 
+    const cleanupCosmetic = createHoverEffect(cosmeticButtonRef, 1.5);
+    const cleanupWeather = createHoverEffect(weatherButtonRef, 1.6); 
+
+    // Cleanup function
+    return () => {
+      cleanupDemographics && cleanupDemographics();
+      cleanupSkinType && cleanupSkinType();
+      cleanupCosmetic && cleanupCosmetic();
+      cleanupWeather && cleanupWeather();
+    };
+  }, []);
 
   return (
     <div className="relative min-h-screen w-full flex flex-col items-center justify-center bg-white">
-   
-      <div className="relative w-[370px] h-[370px]">
-        {/* Top */}
-        <button
-          className="absolute border-none bg-gray-200 cursor-pointer border-black flex items-center justify-center"
+      
+      <div className="absolute top-2 left-16 max-w-xs text-left text-gray-800 text-sm leading-snug">
+        <span className="font-bold">A.I. ANALYSIS</span><br />
+        A.I. has estimated the following.<br />
+        Fix estimated information if needed.<br />
+     
+      </div>
+      <div className="relative w-[312px] h-[312px]">
+        
+       
+        <div
+          ref={sharedOutlineRef} 
+          className="absolute inset-0 z-10 pointer-events-none" 
           style={{
-            width: squareSize,
-            height: squareSize,
-            top: 0,
-            left: "50%",
-            transform: `translateX(-50%) translateY(0) rotate(45deg)`,
+            border: "1px dotted rgba(128, 128, 128, 0.5)",
+            transform: "rotate(45deg)",
           }}
-        >
-          <span className="rotate-315">DEMOGRAPHICS</span>
-        </button>
+        />
 
-        {/* Left */}
+        {/* Top Button - Demographics */}
+        <Link href="/summary">
+          <button
+            ref={demographicsButtonRef}
+            className="absolute border-none bg-gray-200 hover:bg-gray-300 cursor-pointer border-black flex items-center justify-center group"
+            style={{
+              width: squareSize,
+              height: squareSize,
+              top: -32,
+              left: "50%",
+              transform: `translateX(-50%) rotate(45deg)`,
+              zIndex: 20,
+            }}
+          >
+            <span className="rotate-315 relative z-20 font-bold">DEMOGRAPHICS</span>
+          </button>
+        </Link>
+
+        {/* Left Button - Skin Type Details */}
         <button
-          className="absolute border-none bg-gray-100 cursor-not-allowed border-black flex items-center justify-center"
+          ref={skinTypeButtonRef}
+          className="absolute border-none bg-gray-100 hover:bg-gray-200 cursor-not-allowed border-black flex items-center justify-center group"
           style={{
             width: squareSize,
             height: squareSize,
             top: "50%",
-            left: 0,
+            left: -32,
             transform: `translateY(-50%) rotate(45deg)`,
+            zIndex: 20,
           }}
         >
-          <span className="rotate-315">SKIN TYPE DETAILS</span>
+          <span className="rotate-315 relative z-20 font-bold">SKIN TYPE DETAILS</span>
         </button>
 
-        {/* Right */}
+        {/* Right Button - Cosmetic Concerns */}
         <button
-          className="absolute border-none bg-gray-100 cursor-not-allowed border-black flex items-center justify-center"
+          ref={cosmeticButtonRef}
+          className="absolute border-none bg-gray-100 hover:bg-gray-200 cursor-not-allowed border-black flex items-center justify-center group"
           style={{
             width: squareSize,
             height: squareSize,
             top: "50%",
-            right: 0,
+            right: -32,
             transform: `translateY(-50%) rotate(45deg)`,
+            zIndex: 20,
           }}
         >
-          <span className="rotate-315">COSMETIC CONSCERNS</span>
+          <span className="rotate-315 relative z-20 font-bold">COSMETIC CONCERNS</span>
         </button>
 
-        {/* Bottom */}
+        {/* Bottom Button - Weather */}
         <button
-          className="absolute border-none bg-gray-100 cursor-not-allowed border-black flex items-center justify-center"
+          ref={weatherButtonRef}
+          className="absolute border-none bg-gray-100 hover:bg-gray-200 cursor-not-allowed border-black flex items-center justify-center group"
           style={{
             width: squareSize,
             height: squareSize,
-            bottom: 0,
+            bottom: -32,
             left: "50%",
             transform: `translateX(-50%) rotate(45deg)`,
+            zIndex: 20,
           }}
         >
-          <span className="rotate-315">WEATHER</span>
+          <span className="rotate-315 relative z-20 font-bold">WEATHER</span>
         </button>
       </div>
-
   
       <div className="absolute bottom-44 w-full flex justify-between px-8">
-        {/* Back */}
+       
         <Link
           href="/"
           className="flex items-center space-x-8 group hover:scale-110 transition-transform duration-500"
@@ -80,7 +179,7 @@ export default function SummaryPage() {
           <span className="font-bold text-sm">BACK</span>
         </Link>
 
-        {/* Get Summary */}
+      
         <Link
           href="/summary"
           className="flex items-center space-x-8 group  transition-transform duration-500 hover:scale-110 transition"
@@ -94,4 +193,3 @@ export default function SummaryPage() {
     </div>
   );
 }
-
