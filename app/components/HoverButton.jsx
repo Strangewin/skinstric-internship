@@ -7,9 +7,9 @@ export default function HoverButton({
   children,
   style,
   isDisabled = false,
-  bgColor = "bg-gray-200", // Default background color
-  borderColor = "border-gray-400", // Default border color for the outline
-  size = 150, // Default size
+  bgColor = "bg-gray-200",
+  borderColor = "border-gray-400",
+  size = 150,
 }) {
   const outlineRef = useRef(null);
 
@@ -37,9 +37,9 @@ export default function HoverButton({
     <div
       className="relative"
       style={{
-        ...style, // Spread the incoming style props
-        width: size, // Use the new size prop
-        height: size, // Use the new size prop
+        ...style, 
+        width: size, 
+        height: size, 
       }}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}

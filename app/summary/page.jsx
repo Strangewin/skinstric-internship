@@ -133,16 +133,22 @@ const getSexData = (data) => {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-white px-8 relative">
+  <div className="h-screen flex flex-col bg-white px-8 relative">
       <div className="mt-16 font-bold">A.I. ANALYSIS</div>
       <h1 className="text-[60px] max-md:text-[40px]">DEMOGRAPHICS</h1>
       <p className="text-sm">PREDICTED RACE & AGE</p>
 
       {/* Main grid */}
       <div className="flex-grow overflow-y-auto pb-32 mt-12">
-        <div className="w-full flex lg:flex-row flex-col gap-4">
+        <div
+          className="w-full flex lg:flex-row flex-col gap-4"
+        >
           {/* Left column */}
-          <div className="lg:flex-[3] flex flex-col gap-[8px]">
+          <div
+            className="lg:flex-[3] flex flex-col gap-[8px]
+              md:w-1/3 md:min-w-[220px] md:max-w-[300px]
+              sm:w-full sm:min-w-0 sm:max-w-none"
+          >
             {[
               { key: "race", label: "RACE", value: confirmedOptions?.race || raceData[0]?.label },
               { key: "age", label: "AGE", value: confirmedOptions?.age || ageData[0]?.label },
@@ -164,9 +170,13 @@ const getSexData = (data) => {
           </div>
 
           {/* Middle column */}
-          <div className="lg:flex-[12] p-4 bg-gray-100 border-t border-black flex flex-col items-center justify-center">
+          <div
+            className="lg:flex-[12] p-4 bg-gray-100 border-t border-black flex flex-col items-center justify-center
+              md:w-2/3 md:min-w-[220px] md:max-w-[500px]
+              sm:w-full sm:min-w-0 sm:max-w-none"
+          >
             <div className="text-2xl font-semibold mb-8">
-              {selectedOptions[selectedCategory] || "No data"}
+              {selectedOptions[selectedCategory] || defaultItem?.label || "N/A"}
             </div>
             <div className="w-72 h-72">
               <svg viewBox="0 0 36 36" className="w-full h-full">
@@ -205,7 +215,11 @@ const getSexData = (data) => {
           </div>
 
           {/* Right column */}
-          <div className="lg:flex-[5] p-4 bg-gray-100 border-t border-black flex flex-col">
+          <div
+            className="lg:flex-[5] p-4 bg-gray-100 border-t border-black flex flex-col
+              md:w-full md:min-w-0 md:max-w-none
+              sm:w-full sm:min-w-0 sm:max-w-none"
+          >
             <div className="flex items-center justify-between py-2 font-bold">
               <span>{selectedCategory.toUpperCase()}</span>
               <span>A.I. CONFIDENCE</span>
@@ -232,7 +246,7 @@ const getSexData = (data) => {
       </div>
 
       
-      <footer className="flex items-center justify-between px-8 py-8 border-t border-gray-200">
+  <footer className="flex flex-col md:flex-row items-center justify-between px-4 md:px-8 py-8 border-t border-gray-200 gap-4 md:gap-0">
         <Link
           href="/"
           className="flex items-center space-x-3 group hover:scale-110 transition-transform duration-300"

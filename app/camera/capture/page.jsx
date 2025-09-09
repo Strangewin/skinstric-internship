@@ -44,7 +44,7 @@ export default function CameraPage() {
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
     const base64Image = canvas.toDataURL("image/png");
-    setPreviewImage(base64Image); // set preview state
+    setPreviewImage(base64Image); 
   };
 
   const handleRetake = () => {

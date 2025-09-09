@@ -3,9 +3,10 @@ import Link from "next/link";
 import { IoTriangleSharp } from "react-icons/io5";
 import { useRef, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-function RotatingSquares({ imgSrc, imgAlt, onClick, callout, children }) {
+
+function RotatingSquares({ imgSrc, imgAlt, onClick, callout, children, isMobile }) {
   const squares = [useRef(null), useRef(null), useRef(null)];
-  const sizes = [300, 350, 400];
+  const sizes = isMobile ? [200, 250, 300] : [300, 350, 400];
   const durations = [50000, 70000, 90000];
   const colors = ["border-gray-400", "border-gray-300", "border-gray-200"];
 
@@ -24,8 +25,12 @@ function RotatingSquares({ imgSrc, imgAlt, onClick, callout, children }) {
     });
   }, []);
 
+  const containerClass = isMobile 
+    ? "relative flex items-center justify-center w-full h-[200px] max-w-[400px]"
+    : "relative flex items-center justify-center w-[550px] h-[250px] -mt-20";
+
   return (
-    <div className="relative flex items-center justify-center w-[550px] h-[250px] -mt-20">
+    <div className={containerClass}>
       {squares.map((ref, idx) => (
         <div
           key={idx}
@@ -35,7 +40,6 @@ function RotatingSquares({ imgSrc, imgAlt, onClick, callout, children }) {
         />
       ))}
 
-    
       <button
         type="button"
         aria-label={imgAlt}
@@ -45,12 +49,12 @@ function RotatingSquares({ imgSrc, imgAlt, onClick, callout, children }) {
         <img
           src={imgSrc}
           alt={imgAlt}
-          className="w-[140px] h-[140px] mx-auto mb-2"
+          className={isMobile ? "w-[100px] h-[100px] mx-auto mb-2" : "w-[140px] h-[140px] mx-auto mb-2"}
         />
       </button>
 
-      
-      {callout && (
+      {/* Callouts - hide on mobile for cleaner look */}
+      {callout && !isMobile && (
         <div className={`absolute flex items-center ${callout.position}`}>
           <div
             className={`w-[110px] h-[2px] bg-black origin-left ${callout.lineRotation}`}
@@ -83,7 +87,18 @@ function RotatingSquares({ imgSrc, imgAlt, onClick, callout, children }) {
 export default function ResultPage() {
   const router = useRouter();
   const [showCameraPrompt, setShowCameraPrompt] = useState(false);
-  const [isLoading, setIsLoading] = useState(false); 
+  const [isLoading, setIsLoading] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const openCameraPrompt = () => setShowCameraPrompt(true);
   const handleAllowCamera = () => {
@@ -96,99 +111,134 @@ export default function ResultPage() {
     document.getElementById("galleryInput")?.click();
   };
 
-const handleImageUpload = async (event) => {
-  const file = event.target.files?.[0];
-  if (!file) return;
+  const handleImageUpload = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
 
-  setIsLoading(true);
+    setIsLoading(true);
 
-  const reader = new FileReader();
-  reader.onloadend = async () => {
-    const base64Image = reader.result;
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      const base64Image = reader.result;
 
-    
-    const fetchPromise = fetch("https://us-central1-frontend-simplified.cloudfunctions.net/skinstricPhaseTwo", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ image: base64Image }),
-    }).then(res => res.json());
+      const fetchPromise = fetch("https://us-central1-frontend-simplified.cloudfunctions.net/skinstricPhaseTwo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image: base64Image }),
+      }).then(res => res.json());
 
-    
-    setTimeout(() => {
-      router.push("/select");
-    }, 3000);
+      setTimeout(() => {
+        router.push("/select");
+      }, 3000);
 
-    
-    fetchPromise.then(data => {
-      console.log("AI predictions:", data);
-    
-    }).catch(err => {
-      console.error("Error sending image:", err);
-    });
+      fetchPromise.then(data => {
+        console.log("AI predictions:", data);
+      }).catch(err => {
+        console.error("Error sending image:", err);
+      });
+    };
+
+    reader.readAsDataURL(file);
   };
 
-  reader.readAsDataURL(file);
-};
   return (
-    <div className="relative min-h-screen w-full bg-white flex flex-col items-center justify-center overflow-hidden">
+    <div className="relative min-h-screen w-full bg-white flex flex-col items-center justify-center overflow-hidden px-4">
       {/* Loading overlay */}
       {isLoading && (
         <div className="absolute inset-0 bg-white/100 flex items-center justify-center z-50">
-         
-            <p className="text-lg font-semibold text-black">PREPARING YOUR ANALYSIS...</p>
-         
+          <p className="text-lg font-semibold text-black">PREPARING YOUR ANALYSIS...</p>
         </div>
       )}
 
-      <div className="flex flex-row items-center justify-center gap-16 z-10">
-        {/* Camera shutter (unchanged) */}
-        <RotatingSquares
-          imgSrc="/camera-shutter.png"
-          imgAlt="Open Camera"
-          onClick={openCameraPrompt}
-          callout={{
-            position: "right-[-30px] top-1/2 translate-y-[-150%]",
-            lineRotation: "rotate-[-30deg]",
-            offset: "-top-14 -left-6",
-            text: "ALLOW A.I. \nTO SCAN YOUR FACE",
-          }}
-        >
-          {showCameraPrompt && (
-            <div className="absolute left-[90%] -translate-x-1/2 w-[290px] h-[100px] rounded- border border-black/15 bg-black shadow-lg z-20">
-              <div className="px-4 py-3 text-center text-white text-sm font-semibold">
-                ALLOW AI TO ACCESS CAMERA?
-              </div>
-              <div className="flex border-t text-white ">
-                <button
-                  onClick={handleDenyCamera}
-                  className="flex-1 py-2 text-sm cursor-pointer hover:gray-100 transition-colors"
-                >
-                  DENY
-                </button>
-                <button
-                  onClick={handleAllowCamera}
-                  className="flex-1 py-2 text-sm cursor-pointer font-bold hover:gray-100 transform transition-colors"
-                >
-                  ALLOW
-                </button>
-              </div>
-            </div>
-          )}
-        </RotatingSquares>
+      {/* Mobile text labels */}
+      {isMobile && (
+        <div className="flex flex-col items-center gap-8 mb-12">
+          <h2 className="text-2xl font-bold text-center">CHOOSE YOUR METHOD</h2>
+          <p className="text-sm text-gray-600 text-center max-w-sm">
+            Allow A.I. to analyze your face using your camera or photo gallery
+          </p>
+        </div>
+      )}
 
-        {/* ✅ Gallery upload with loading + redirect */}
-        <RotatingSquares
-          imgSrc="/image-gallery.png"
-          imgAlt="Open Photo Library"
-          onClick={openGallery}
-          callout={{
-            position: "right-[30px] top-1/2 translate-y-[50%]",
-            lineRotation: "rotate-[130deg]",
-            offset: "top-21 -left-88",
-            text: "ALLOW A.I. \nTO ACCESS GALLERY",
-            reverse: true,
-          }}
-        />
+      {/* Main content area */}
+      <div className={isMobile 
+        ? "flex flex-col items-center justify-center gap-12 z-10 w-full max-w-md"
+        : "flex flex-row items-center justify-center gap-16 z-10"
+      }>
+        
+        {/* Camera option */}
+        <div className="flex flex-col items-center">
+          {isMobile && (
+            <h3 className="text-lg font-semibold mb-4 text-center">SCAN YOUR FACE</h3>
+          )}
+          <RotatingSquares
+            imgSrc="/camera-shutter.png"
+            imgAlt="Open Camera"
+            onClick={openCameraPrompt}
+            isMobile={isMobile}
+            callout={!isMobile ? {
+              position: "right-[-30px] top-1/2 translate-y-[-150%]",
+              lineRotation: "rotate-[-30deg]",
+              offset: "-top-14 -left-6",
+              text: "ALLOW A.I. \nTO SCAN YOUR FACE",
+            } : null}
+          >
+            {showCameraPrompt && (
+              <div className={isMobile 
+                ? "absolute top-full mt-4 w-[280px] rounded border border-black/15 bg-black shadow-lg z-20"
+                : "absolute left-[90%] -translate-x-1/2 w-[290px] h-[100px] rounded border border-black/15 bg-black shadow-lg z-20"
+              }>
+                <div className="px-4 py-3 text-center text-white text-sm font-semibold">
+                  ALLOW AI TO ACCESS CAMERA?
+                </div>
+                <div className="flex border-t text-white">
+                  <button
+                    onClick={handleDenyCamera}
+                    className="flex-1 py-2 text-sm cursor-pointer hover:bg-gray-100 hover:text-black transition-colors"
+                  >
+                    DENY
+                  </button>
+                  <button
+                    onClick={handleAllowCamera}
+                    className="flex-1 py-2 text-sm cursor-pointer font-bold hover:bg-gray-100 hover:text-black transition-colors"
+                  >
+                    ALLOW
+                  </button>
+                </div>
+              </div>
+            )}
+          </RotatingSquares>
+          {isMobile && (
+            <p className="text-xs text-gray-500 text-center mt-4 max-w-xs">
+              Take a live photo with your camera
+            </p>
+          )}
+        </div>
+
+        {/* Gallery option */}
+        <div className="flex flex-col items-center">
+          {isMobile && (
+            <h3 className="text-lg font-semibold mb-4 text-center">UPLOAD FROM GALLERY</h3>
+          )}
+          <RotatingSquares
+            imgSrc="/image-gallery.png"
+            imgAlt="Open Photo Library"
+            onClick={openGallery}
+            isMobile={isMobile}
+            callout={!isMobile ? {
+              position: "right-[30px] top-1/2 translate-y-[50%]",
+              lineRotation: "rotate-[130deg]",
+              offset: "top-21 -left-88",
+              text: "ALLOW A.I. \nTO ACCESS GALLERY",
+              reverse: true,
+            } : null}
+          />
+          {isMobile && (
+            <p className="text-xs text-gray-500 text-center mt-4 max-w-xs">
+              Choose an existing photo from your gallery
+            </p>
+          )}
+        </div>
 
         <input
           id="galleryInput"
@@ -199,9 +249,13 @@ const handleImageUpload = async (event) => {
         />
       </div>
 
+      {/* Back button */}
       <Link
         href="/"
-        className="group absolute left-14 bottom-28 flex items-center z-20"
+        className={isMobile 
+          ? "group fixed left-4 bottom-8 flex items-center z-20"
+          : "group absolute left-14 bottom-28 flex items-center z-20"
+        }
       >
         <span className="inline-flex items-center justify-center w-10 h-10 rotate-45 border border-gray-800 mr-2 transition-transform duration-300 group-hover:scale-110">
           <IoTriangleSharp className="text-black rotate-[-20deg]" size={14} />
@@ -211,8 +265,3 @@ const handleImageUpload = async (event) => {
     </div>
   );
 }
-
-
-
-
-
