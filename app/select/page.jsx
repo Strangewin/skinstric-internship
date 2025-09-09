@@ -70,7 +70,7 @@ export default function SelectPage() {
     const cleanupCosmetic = createHoverEffect(cosmeticButtonRef, 1.5);
     const cleanupWeather = createHoverEffect(weatherButtonRef, 1.6); 
 
-    // Cleanup function
+  
     return () => {
       cleanupDemographics && cleanupDemographics();
       cleanupSkinType && cleanupSkinType();
