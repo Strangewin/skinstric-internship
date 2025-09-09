@@ -186,7 +186,7 @@ export default function Home() {
             transform: "translateY(-50%)",
           }}
         >
-          <Link href="/discover" className="flex items-center group">
+          <Link href="/" className="flex items-center group">
             <span className="inline-flex items-center justify-center w-7 h-7 border border-black rotate-45 mr-2">
               <IoTriangleSharp className="-rotate-20" size={12} />
             </span>
