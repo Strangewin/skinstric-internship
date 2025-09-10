@@ -218,23 +218,27 @@ export default function Home() {
           </Link>
         </div>
 
-        <div>
-          <div className="hidden lg:block absolute left-30 bottom-40 m-8 max-w-xs text-xs font-bold text-black opacity-80 leading-snug font-Roobert TRIAL">
-            SKINSTRIC DEVELOPED AN A.I. THAT CREATES A<br />
-            HIGHLY-PERSONALIZED ROUTINE TAILORED TO
-            <br />
-            WHAT YOUR SKIN NEEDS.
-          </div>
+  <div className="absolute left-4 sm:left-8 lg:left-12 bottom-12 sm:bottom-16 lg:bottom-24 max-w-[90vw] sm:max-w-sm lg:max-w-md px-2">
+  <p className="
+    text-black opacity-80 font-Roobert TRIAL leading-snug
+    text-[10px] sm:text-xs lg:text-sm
+    font-medium sm:font-semibold lg:font-bold
+  ">
+    <span className="hidden lg:inline">
+      SKINSTRIC DEVELOPED AN A.I. THAT CREATES A<br />
+      HIGHLY-PERSONALIZED ROUTINE TAILORED TO<br />
+      WHAT YOUR SKIN NEEDS.
+    </span>
+    <span className="hidden sm:inline lg:hidden">
+      SKINSTRIC DEVELOPED AN A.I. THAT CREATES A HIGHLY-PERSONALIZED ROUTINE
+      TAILORED TO WHAT YOUR SKIN NEEDS.
+    </span>
+    <span className="inline sm:hidden">
+      SKINSTRIC: A.I. for your personalized skincare routine.
+    </span>
+  </p>
+</div>
 
-          <div className="hidden sm:block lg:hidden absolute left-8 bottom-8 m-4 max-w-xs text-xs font-semibold text-black opacity-80 leading-snug font-Roobert TRIAL">
-            SKINSTRIC DEVELOPED AN A.I. THAT CREATES A HIGHLY-PERSONALIZED
-            ROUTINE TAILORED TO WHAT YOUR SKIN NEEDS.
-          </div>
-
-          <div className="block sm:hidden absolute left-4 bottom-4 m-2 max-w-[90vw] text-[10px] font-medium text-black opacity-80 leading-tight font-Roobert TRIAL">
-            SKINSTRIC: A.I. for your personalized skincare routine.
-          </div>
-        </div>
       </div>
 
       {/* MOBILE LAYOUT (<1024px) */}
