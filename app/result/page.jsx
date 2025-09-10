@@ -111,35 +111,45 @@ export default function ResultPage() {
     document.getElementById("galleryInput")?.click();
   };
 
-  const handleImageUpload = async (event) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+const handleImageUpload = async (event) => {
+  const file = event.target.files?.[0];
+  if (!file) return;
 
-    setIsLoading(true);
+  setIsLoading(true);
 
-    const reader = new FileReader();
-    reader.onloadend = async () => {
-      const base64Image = reader.result;
+  const reader = new FileReader();
+  reader.onloadend = async () => {
+    try {
+      let base64Image = reader.result;
 
-      const fetchPromise = fetch("https://us-central1-frontend-simplified.cloudfunctions.net/skinstricPhaseTwo", {
+     
+      if (typeof base64Image === "string" && base64Image.includes(",")) {
+        base64Image = base64Image.split(",")[1];
+      }
+
+      const res = await fetch("https://us-central1-frontend-simplified.cloudfunctions.net/skinstricPhaseTwo", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ image: base64Image }),
-      }).then(res => res.json());
-
-      setTimeout(() => {
-        router.push("/select");
-      }, 3000);
-
-      fetchPromise.then(data => {
-        console.log("AI predictions:", data);
-      }).catch(err => {
-        console.error("Error sending image:", err);
       });
-    };
 
-    reader.readAsDataURL(file);
+      const data = await res.json();
+      console.log("AI predictions:", data);
+
+  
+      localStorage.setItem("analysisData", JSON.stringify(data));
+
+ 
+      router.push("/select");
+    } catch (err) {
+      console.error("Error sending image:", err);
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+  reader.readAsDataURL(file);
+};
 
   return (
     <div className="relative min-h-screen w-full bg-white flex flex-col items-center justify-center overflow-hidden px-4">

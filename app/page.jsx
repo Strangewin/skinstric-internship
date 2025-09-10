@@ -209,7 +209,7 @@ export default function Home() {
           }}
         >
           <Link href="/testing" className="flex items-center group">
-            <span className="text-xs text-black group-hover: whitespace-nowrap mr-2">
+            <span className="text-xs text-black group-hover:whitespace-nowrap mr-2">
               TAKE TEST
             </span>
             <span className="inline-flex items-center justify-center w-7 h-7 border border-black rotate-45">
