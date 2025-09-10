@@ -1,4 +1,4 @@
-"use client"; 
+"use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { IoTriangleSharp } from "react-icons/io5";
@@ -18,7 +18,7 @@ export default function SummaryPage() {
     return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
   };
 
-  // Define data formatters once, inside the component
+  // Formatters
   const getRaceData = (data) => {
     if (!data?.race) return [];
     return Object.entries(data.race)
@@ -49,30 +49,43 @@ export default function SummaryPage() {
       .sort((a, b) => parseFloat(b.value) - parseFloat(a.value));
   };
 
-  // Call the functions to get the data arrays based on the current state
   const raceData = getRaceData(demographicData);
   const ageData = getAgeData(demographicData);
   const sexData = getSexData(demographicData);
 
-useEffect(() => {
+  useEffect(() => {
     const stored = sessionStorage.getItem("demographicData");
-    console.log("Stored data from sessionStorage:", stored);
     if (stored) {
-        const parsed = JSON.parse(stored);
+      const parsed = JSON.parse(stored);
 
-        setDemographicData(parsed.data);
+      setDemographicData(parsed.data);
 
-        const initialRace = getRaceData(parsed)[0]?.label || null;
-        const initialAge = getAgeData(parsed)[0]?.label || null;
-        const initialSex = getSexData(parsed)[0]?.label || null;
+      const initialRace = getRaceData(parsed.data)[0]?.label || null;
+      const initialAge = getAgeData(parsed.data)[0]?.label || null;
+      const initialSex = getSexData(parsed.data)[0]?.label || null;
 
-        setSelectedOptions({
-            race: initialRace,
-            age: initialAge,
-            sex: initialSex,
-        });
+      setSelectedOptions({
+        race: initialRace,
+        age: initialAge,
+        sex: initialSex,
+      });
     }
-}, []);
+  }, []);
+
+  // Automatically set top option when switching categories
+  const handleCategoryChange = (category) => {
+    setSelectedCategory(category);
+
+    let topOption = null;
+    if (category === "race") topOption = raceData[0]?.label || null;
+    if (category === "age") topOption = ageData[0]?.label || null;
+    if (category === "sex") topOption = sexData[0]?.label || null;
+
+    setSelectedOptions((prev) => ({
+      ...prev,
+      [category]: topOption,
+    }));
+  };
 
   const selectedData =
     selectedCategory === "race"
@@ -81,17 +94,10 @@ useEffect(() => {
       ? ageData
       : sexData;
 
-  const confirmedLabel = confirmedOptions
-    ? confirmedOptions[selectedCategory]
-    : null;
-  const confirmedItem = confirmedLabel
-    ? selectedData.find((item) => item.label === confirmedLabel)
-    : null;
-
   const defaultItem = selectedData[0] || null;
 
   const handleSelectOption = (category, label) => {
-    setSelectedOptions(prev => ({ ...prev, [category]: label }));
+    setSelectedOptions((prev) => ({ ...prev, [category]: label }));
   };
 
   const handleConfirm = () => {
@@ -99,50 +105,23 @@ useEffect(() => {
   };
 
   const handleReset = () => {
-   const getRaceData = (data) => {
-  if (!data) return [];
-  
-  const raceData = data.race || data.Race || data.demographics?.race;
-  if (!raceData) return [];
-  
-  return Object.entries(raceData).map(([key, value]) => ({
-    label: capitalize(key),
-    value: value <= 1 ? `${Math.round(value * 100)}%` : `${value}%`
-  }));
-};
-
-const getAgeData = (data) => {
-  const ageData = data.age || data.Age || data.demographics?.age;
-  if (!ageData) return [];
-  return Object.entries(ageData).map(([key, value]) => ({
-    label: key,
-    value: value <= 1 ? `${Math.round(value * 100)}%` : `${value}%`
-  }));
-};
-
-const getSexData = (data) => {
-  const sexData = data.sex || data.Sex || data.gender || data.Gender || data.demographics?.sex;
-  if (!sexData) return [];
-  return Object.entries(sexData).map(([key, value]) => ({
-    label: capitalize(key),
-    value: value <= 1 ? `${Math.round(value * 100)}%` : `${value}%`
-  }));
-};
-    setSelectedOptions({ race, age, sex });
+    setSelectedOptions({
+      race: raceData[0]?.label || null,
+      age: ageData[0]?.label || null,
+      sex: sexData[0]?.label || null,
+    });
     setConfirmedOptions(null);
   };
 
   return (
-  <div className="h-screen flex flex-col bg-white px-8 relative">
+    <div className="h-screen flex flex-col bg-white px-8 relative">
       <div className="mt-16 font-bold">A.I. ANALYSIS</div>
       <h1 className="text-[60px] max-md:text-[40px]">DEMOGRAPHICS</h1>
       <p className="text-sm">PREDICTED RACE & AGE</p>
 
       {/* Main grid */}
       <div className="flex-grow overflow-y-auto pb-32 mt-12">
-        <div
-          className="w-full flex lg:flex-row flex-col gap-4"
-        >
+        <div className="w-full flex lg:flex-row flex-col gap-4">
           {/* Left column */}
           <div
             className="lg:flex-[3] flex flex-col gap-[8px]
@@ -150,9 +129,21 @@ const getSexData = (data) => {
               sm:w-full sm:min-w-0 sm:max-w-none"
           >
             {[
-              { key: "race", label: "RACE", value: confirmedOptions?.race || raceData[0]?.label },
-              { key: "age", label: "AGE", value: confirmedOptions?.age || ageData[0]?.label },
-              { key: "sex", label: "SEX", value: confirmedOptions?.sex || sexData[0]?.label },
+              {
+                key: "race",
+                label: "RACE",
+                value: confirmedOptions?.race || raceData[0]?.label,
+              },
+              {
+                key: "age",
+                label: "AGE",
+                value: confirmedOptions?.age || ageData[0]?.label,
+              },
+              {
+                key: "sex",
+                label: "SEX",
+                value: confirmedOptions?.sex || sexData[0]?.label,
+              },
             ].map(({ key, label, value }) => (
               <div
                 key={key}
@@ -161,9 +152,11 @@ const getSexData = (data) => {
                     ? "bg-black text-white"
                     : "bg-gray-100 hover:bg-gray-300"
                 }`}
-                onClick={() => setSelectedCategory(key)}
+                onClick={() => handleCategoryChange(key)}
               >
-                <span className="mb-6 uppercase font-bold">{value || "N/A"}</span>
+                <span className="mb-6 uppercase font-bold">
+                  {value || "N/A"}
+                </span>
                 <span className="font-bold">{label}</span>
               </div>
             ))}
@@ -176,7 +169,9 @@ const getSexData = (data) => {
               sm:w-full sm:min-w-0 sm:max-w-none"
           >
             <div className="text-2xl font-semibold mb-8">
-              {selectedOptions[selectedCategory] || defaultItem?.label || "N/A"}
+              {selectedOptions[selectedCategory] ||
+                defaultItem?.label ||
+                "N/A"}
             </div>
             <div className="w-72 h-72">
               <svg viewBox="0 0 36 36" className="w-full h-full">
@@ -195,7 +190,11 @@ const getSexData = (data) => {
                   strokeWidth="1"
                   fill="none"
                   strokeDasharray={`${
-                    selectedData.find(item => item.label === selectedOptions[selectedCategory])?.value.replace("%", "") || 0
+                    selectedData
+                      .find(
+                        (item) => item.label === selectedOptions[selectedCategory]
+                      )
+                      ?.value.replace("%", "") || 0
                   }, 100`}
                   transform="rotate(-90 18 18)"
                   cx="18"
@@ -208,7 +207,9 @@ const getSexData = (data) => {
                   className="text-[4px] fill-black font-bold"
                   textAnchor="middle"
                 >
-                  {selectedData.find(item => item.label === selectedOptions[selectedCategory])?.value || "0%"}
+                  {selectedData.find(
+                    (item) => item.label === selectedOptions[selectedCategory]
+                  )?.value || "0%"}
                 </text>
               </svg>
             </div>
@@ -245,8 +246,8 @@ const getSexData = (data) => {
         </div>
       </div>
 
-      
-  <footer className="flex flex-col md:flex-row items-center justify-between px-4 md:px-8 py-8 border-t border-gray-200 gap-4 md:gap-0">
+      {/* Footer */}
+      <footer className="flex flex-col md:flex-row items-center justify-between px-4 md:px-8 py-8 border-t border-gray-200 gap-4 md:gap-0">
         <Link
           href="/"
           className="flex items-center space-x-3 group hover:scale-110 transition-transform duration-300"
@@ -274,6 +275,8 @@ const getSexData = (data) => {
     </div>
   );
 }
+
+      {/* DESKTOP LAYOUT (>=1024px) */}
 
 
 
