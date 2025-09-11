@@ -18,7 +18,7 @@ export default function SummaryPage() {
     return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
   };
 
-  // Formatters
+  // --- Formatters ---
   const getRaceData = (data) => {
     if (!data?.race) return [];
     return Object.entries(data.race)
@@ -40,8 +40,10 @@ export default function SummaryPage() {
   };
 
   const getSexData = (data) => {
-    if (!data?.gender) return [];
-    return Object.entries(data.gender)
+    // Allow both "gender" and "sex"
+    const genderData = data?.gender || data?.sex;
+    if (!genderData) return [];
+    return Object.entries(genderData)
       .map(([key, value]) => ({
         label: capitalize(key),
         value: `${Math.round(value * 100)}%`,
@@ -53,16 +55,20 @@ export default function SummaryPage() {
   const ageData = getAgeData(demographicData);
   const sexData = getSexData(demographicData);
 
+  // --- Load stored data ---
   useEffect(() => {
     const stored = sessionStorage.getItem("demographicData");
     if (stored) {
       const parsed = JSON.parse(stored);
+      console.log("DEMOGRAPHIC DATA PARSED:", parsed);
 
-      setDemographicData(parsed.data);
+      // handle either { data: {...} } or {...} directly
+      const safeData = parsed?.data || parsed;
+      setDemographicData(safeData);
 
-      const initialRace = getRaceData(parsed.data)[0]?.label || null;
-      const initialAge = getAgeData(parsed.data)[0]?.label || null;
-      const initialSex = getSexData(parsed.data)[0]?.label || null;
+      const initialRace = getRaceData(safeData)[0]?.label || null;
+      const initialAge = getAgeData(safeData)[0]?.label || null;
+      const initialSex = getSexData(safeData)[0]?.label || null;
 
       setSelectedOptions({
         race: initialRace,
@@ -72,7 +78,7 @@ export default function SummaryPage() {
     }
   }, []);
 
-  // Automatically set top option when switching categories
+  // --- Category switch ---
   const handleCategoryChange = (category) => {
     setSelectedCategory(category);
 
@@ -96,6 +102,7 @@ export default function SummaryPage() {
 
   const defaultItem = selectedData[0] || null;
 
+  // --- Option handlers ---
   const handleSelectOption = (category, label) => {
     setSelectedOptions((prev) => ({ ...prev, [category]: label }));
   };
@@ -276,7 +283,8 @@ export default function SummaryPage() {
   );
 }
 
-      {/* DESKTOP LAYOUT (>=1024px) */}
+
+
 
 
 

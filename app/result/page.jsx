@@ -122,27 +122,34 @@ const handleImageUpload = async (event) => {
     try {
       let base64Image = reader.result;
 
-     
+
       if (typeof base64Image === "string" && base64Image.includes(",")) {
         base64Image = base64Image.split(",")[1];
       }
 
-      const res = await fetch("https://us-central1-frontend-simplified.cloudfunctions.net/skinstricPhaseTwo", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ image: base64Image }),
-      });
+      const res = await fetch(
+        "https://us-central1-api-skinstric-ai.cloudfunctions.net/skinstricPhaseTwo",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ image: base64Image }),
+        }
+      );
+
+      if (!res.ok) {
+        throw new Error(`Server returned ${res.status}`);
+      }
 
       const data = await res.json();
       console.log("AI predictions:", data);
 
-  
-      localStorage.setItem("analysisData", JSON.stringify(data));
+     
+      sessionStorage.setItem("demographicData", JSON.stringify(data));
 
- 
       router.push("/select");
     } catch (err) {
       console.error("Error sending image:", err);
+      alert("Failed to upload image. Try again.");
     } finally {
       setIsLoading(false);
     }
