@@ -195,7 +195,7 @@ const handleLeftHover = () => {
   className="absolute z-30 flex items-center"
   style={{
     width: "max-content",
-    left: "10%",       
+    left: "5%",       
     top: "50vh",      
     transform: "translateY(-50%)",
   }}
@@ -218,7 +218,7 @@ const handleLeftHover = () => {
   className="absolute z-30 flex items-center"
   style={{
     width: "max-content",
-    right: "10%",     
+    right: "5%",     
     top: "50vh",      
     transform: "translateY(-50%)",
   }}
